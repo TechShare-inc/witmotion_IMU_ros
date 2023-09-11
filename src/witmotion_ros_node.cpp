@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
 
   QCoreApplication app(argc, argv);
   rclcpp::InitOptions options{};
-  options.shutdown_on_sigint = true;
+  options.shutdown_on_signal = true;
   rclcpp::init(argc, argv, options);
   rclcpp::on_shutdown([]() {
     RCLCPP_INFO(rclcpp::get_logger("MinimalPublisher"), "Shutting down QT...");
