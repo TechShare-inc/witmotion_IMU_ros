@@ -492,22 +492,26 @@ bool ROSWitmotionSensorController::Restart(
   return true;
 }
 
-void ROSWitmotionSensorController::imu_process(
-    const witmotion_datapacket &packet) {
+void ROSWitmotionSensorController::imu_process(const witmotion_datapacket &packet) {
+  // RCLCPP_INFO(rclcpp::get_logger("ROSWitmotionSensorController"), "Entering imu_process function.");
 
   if (!(imu_enable_accel || imu_enable_velocities || imu_enable_orientation))
     return;
+
   static sensor_msgs::msg::Imu msg;
   msg.header.frame_id = imu_frame_id;
   msg.header.stamp = rclcpp::Clock().now();
+
   for (size_t i = 0; i < 9; i++) {
     msg.linear_acceleration_covariance[i] = imu_accel_covariance[i];
     msg.angular_velocity_covariance[i] = imu_velocity_covariance[i];
     msg.orientation_covariance[i] = imu_orientation_covariance[i];
   }
+
   static float ax, ay, az, t;
   static float wx, wy, wz;
   static float x, y, z, qx, qy, qz, qw;
+
   switch (static_cast<witmotion_packet_id>(packet.id_byte)) {
   case pidAcceleration:
     decode_accelerations(packet, ax, ay, az, t);
@@ -532,18 +536,22 @@ void ROSWitmotionSensorController::imu_process(
     imu_have_orientation = imu_native_orientation;
     break;
   default:
+    RCLCPP_INFO(rclcpp::get_logger("ROSWitmotionSensorController"), "Unrecognized packet ID.");
     return;
   }
+
   if (imu_enable_accel && imu_have_accel) {
     msg.linear_acceleration.x = ax;
     msg.linear_acceleration.y = ay;
     msg.linear_acceleration.z = az;
   }
+
   if (imu_enable_velocities && imu_have_velocities) {
     msg.angular_velocity.x = wx;
     msg.angular_velocity.y = wy;
     msg.angular_velocity.z = wz;
   }
+
   if (imu_enable_orientation && imu_have_orientation) {
     tf2::Quaternion tf_orientation;
     if (imu_native_orientation) {
@@ -556,18 +564,25 @@ void ROSWitmotionSensorController::imu_process(
     tf_orientation = tf_orientation.normalize();
     msg.orientation = tf2::toMsg(tf_orientation);
   }
+
   if ((imu_enable_accel == imu_have_accel) &&
       (imu_enable_velocities == imu_have_velocities) &&
-      (imu_enable_orientation == imu_have_orientation)) {    
+      (imu_enable_orientation == imu_have_orientation)) {
+    
+    RCLCPP_INFO(rclcpp::get_logger("ROSWitmotionSensorController"), "Publishing IMU message.");
     imu_publisher->publish(msg);
     
     imu_have_accel = false;
     imu_have_velocities = false;
     imu_have_orientation = false;
-
-
+  } else {
+    // RCLCPP_INFO(rclcpp::get_logger("ROSWitmotionSensorController"),  "Not publishing due to conditional check:");
+    // RCLCPP_INFO(rclcpp::get_logger("ROSWitmotionSensorController"),  "imu_enable_accel: %d, imu_have_accel: %d", imu_enable_accel, imu_have_accel);
+    // RCLCPP_INFO(rclcpp::get_logger("ROSWitmotionSensorController"),  "imu_enable_velocities: %d, imu_have_velocities: %d", imu_enable_velocities, imu_have_velocities);
+    // RCLCPP_INFO(rclcpp::get_logger("ROSWitmotionSensorController"),  "imu_enable_orientation: %d, imu_have_orientation: %d", imu_enable_orientation, imu_have_orientation);
   }
 }
+
 
 void ROSWitmotionSensorController::temp_process(
     const witmotion_datapacket &packet) {
