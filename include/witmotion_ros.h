@@ -71,6 +71,7 @@ private:
     static std::string imu_frame_id;
     static bool imu_enable_accel;
     static bool imu_have_accel;
+    static bool use_sim_time_;
     static std::vector<double> imu_accel_covariance;
     static bool imu_enable_velocities;
     static bool imu_have_velocities;

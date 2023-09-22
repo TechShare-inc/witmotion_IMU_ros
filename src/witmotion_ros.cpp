@@ -8,6 +8,7 @@ rclcpp::Service<std_srvs::srv::Empty>::SharedPtr restart_service;
 rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_publisher;
 std::string ROSWitmotionSensorController::imu_frame_id = "imu";
 bool ROSWitmotionSensorController::imu_enable_accel = false;
+bool ROSWitmotionSensorController::use_sim_time_ = false;
 bool ROSWitmotionSensorController::imu_enable_velocities = false;
 bool ROSWitmotionSensorController::imu_enable_orientation = false;
 bool ROSWitmotionSensorController::imu_have_accel = false;
@@ -126,7 +127,9 @@ ROSWitmotionSensorController::ROSWitmotionSensorController()
       node->get_parameter("imu_publisher.measurements.acceleration.enabled")
           .get_parameter_value()
           .get<bool>();
-
+  use_sim_time_ = node->get_parameter("use_sim_time")
+                     .get_parameter_value()
+                     .get<bool>();
   if (imu_enable_accel) {
 
     node->declare_parameter(
@@ -500,7 +503,14 @@ void ROSWitmotionSensorController::imu_process(const witmotion_datapacket &packe
 
   static sensor_msgs::msg::Imu msg;
   msg.header.frame_id = imu_frame_id;
-  msg.header.stamp = rclcpp::Clock().now();
+  if (use_sim_time_){
+    static rclcpp::Node::SharedPtr static_node = rclcpp::Node::make_shared("static_node");
+    msg.header.stamp = static_node->now();
+    //  msg.header.stamp = this->now();
+  }else{
+     msg.header.stamp = rclcpp::Clock().now();
+  }
+ 
 
   for (size_t i = 0; i < 9; i++) {
     msg.linear_acceleration_covariance[i] = imu_accel_covariance[i];

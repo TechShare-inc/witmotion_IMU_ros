@@ -2,12 +2,12 @@ witmotion:
   ros__parameters:
     port: HWT905
     baud_rate: 115200 # baud
-    polling_interval: 10 # ms
-    timeout_ms: 1000 # ms
+    polling_interval: 4 #5 is the correct but want to make sure to get precice data (ms)
+    timeout_ms: 150 # ms
     restart_service_name: /restart_imu
     imu_publisher:
-      topic_name: /imu
-      frame_id: imu
+      topic_name: /imu/data
+      frame_id: imu_link
       use_native_orientation: false
       measurements:
         acceleration:
