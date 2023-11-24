@@ -16,6 +16,12 @@ reload_rules() {
     sudo udevadm control --reload-rules && sudo udevadm trigger
 }
 
+
+sudo systemctl stop brltty
+sudo systemctl disable brltty
+sudo apt-get remove brltty
+
+
 # Main script execution
 create_rule
 reload_rules
