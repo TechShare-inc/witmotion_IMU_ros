@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the new rule
-RULE='SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="HWT905"'
+RULE='SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="HWT905",  MODE="0666"'
 
 # File name for the new rule
 RULE_FILE="/etc/udev/rules.d/99-usb-serial.rules"
