@@ -26,13 +26,5 @@ def generate_launch_description():
          {'use_sim_time': LaunchConfiguration('sim')}]
     )
 
-    base_link_to_imu  =  Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            name="base_link_to_velodyne",
-            arguments='-0.08 0.0 0.25 0.0 0.0 0.0 base_footprint imu_link'.split(' '),
-            output='screen',
-            )
     ld.add_action(node)
-    ld.add_action(base_link_to_imu)
     return ld
