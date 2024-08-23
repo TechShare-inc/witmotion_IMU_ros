@@ -13,17 +13,11 @@ def generate_launch_description():
         'config',
         'wt905.yml'
         )
-    # Declare use_sim_time as an argument
-    use_sim_time_arg = DeclareLaunchArgument(
-        'sim',
-        default_value='false',
-        description='Use simulation (Gazebo) clock if true'
-    )
+
     node=Node(
         package = 'witmotion_ros',
         executable = 'witmotion_ros_node',
-        parameters = [config,
-         {'use_sim_time': LaunchConfiguration('sim')}]
+        parameters = [config]
     )
 
     ld.add_action(node)
